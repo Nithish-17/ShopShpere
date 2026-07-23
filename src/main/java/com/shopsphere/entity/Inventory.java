@@ -24,6 +24,9 @@ public class Inventory extends BaseEntity{
     @Column(name = "maximum_stock", nullable = false)
     private Integer maximumStock;
 
+    @Column(nullable = false)
+    private Integer reservedQuantity = 0;
+
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
@@ -34,5 +37,19 @@ public class Inventory extends BaseEntity{
             unique = true
     )
     private Product product;
+
+
+    @Version
+    private long version;
+
+
+
+
+    //helper method
+    public Integer getAvailableQuantity() {
+        return quantity - reservedQuantity;
+    }
+
+
 
 }
