@@ -23,11 +23,11 @@ public class ShoppingCart extends BaseEntity{
             cascade = CascadeType.ALL
     )
     @JoinColumn(
-            name = "customer_id",
+            name = "user_id",
             nullable = false,
             unique = true
     )
-    private Customer customer;
+    private User user;
 
     @OneToMany(
             mappedBy = "shoppingCart",
@@ -36,5 +36,18 @@ public class ShoppingCart extends BaseEntity{
             fetch = FetchType.LAZY
     )
     private List<CartItem> cartItems = new ArrayList<>();
+
+
+
+
+    //helper method
+    public void removeCartItem(
+            CartItem cartItem) {
+
+        cartItems.remove(cartItem);
+
+        cartItem.setShoppingCart(null);
+
+    }
 
 }

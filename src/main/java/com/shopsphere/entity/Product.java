@@ -66,4 +66,5 @@ public class Product extends BaseEntity{
     private List<Review> reviews = new ArrayList<>();
 
 
+
 }

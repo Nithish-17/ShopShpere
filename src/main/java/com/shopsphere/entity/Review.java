@@ -16,7 +16,9 @@ import lombok.Setter;
         name = "reviews",
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {
-                        "customer_id",
+                        "user_id",
+
+
                         "product_id"
                 }
         )
@@ -31,10 +33,10 @@ public class Review extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "customer_id",
+            name = "user_id",
             nullable = false
     )
-    private Customer customer;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

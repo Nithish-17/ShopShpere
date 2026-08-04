@@ -15,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "customers")
-public class Customer extends BaseEntity{
+@Table(name = "users")
+public class User extends BaseEntity{
 
     @Column(
             name = "first_name",
@@ -44,8 +44,13 @@ public class Customer extends BaseEntity{
     )
     private String phone;
 
+    @Column(nullable = false)
+    private String password;
+
+    private Role role;
+
     @OneToOne(
-            mappedBy = "customer",
+            mappedBy = "user",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
@@ -53,13 +58,13 @@ public class Customer extends BaseEntity{
     private ShoppingCart shoppingCart;
 
     @OneToMany(
-            mappedBy = "customer",
+            mappedBy = "user",
             fetch = FetchType.LAZY
     )
     private List<Order> orders = new ArrayList<>();
 
     @OneToMany(
-            mappedBy = "customer",
+            mappedBy = "user",
             fetch = FetchType.LAZY
     )
     private List<Review> reviews = new ArrayList<>();

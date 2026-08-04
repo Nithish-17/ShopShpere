@@ -7,6 +7,7 @@ import com.shopsphere.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class InventoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse createInventory(
             @Valid @RequestBody InventoryRequest request) {
 
@@ -26,6 +28,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/products/{productId}/increase")
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse increaseStock(
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {
@@ -38,6 +41,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/products/{productId}/decrease")
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse decreaseStock(
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {
@@ -50,6 +54,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/products/{productId}/reserve")
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse reserveStock(
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {
@@ -62,6 +67,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/products/{productId}/release")
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse releaseReservedStock(
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {
@@ -75,6 +81,7 @@ public class InventoryController {
 
 
     @PatchMapping("/products/{productId}/confirm")
+    @PreAuthorize("hasRole('ADMIN')")
     public InventoryResponse confirmReservation(
             @PathVariable Long productId,
             @Valid @RequestBody StockUpdateRequest request) {

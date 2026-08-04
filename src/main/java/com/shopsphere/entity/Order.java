@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,15 +28,16 @@ public class Order extends BaseEntity{
     @Column(nullable = false)
     private OrderStatus status;
 
+    @CreationTimestamp
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "customer_id",
+            name = "user_id",
             nullable = false
     )
-    private Customer customer;
+    private User user;
 
     @OneToMany(
             mappedBy = "order",
@@ -44,5 +46,20 @@ public class Order extends BaseEntity{
             fetch = FetchType.LAZY
     )
     private List<OrderItem> orderItems = new ArrayList<>();
+
+
+    public void addOrderItem(
+            OrderItem orderItem
+    ) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void removeOrderItem(
+            OrderItem orderItem
+    ) {
+        orderItems.remove(orderItem);
+        orderItem.setOrder(null);
+    }
 
 }
