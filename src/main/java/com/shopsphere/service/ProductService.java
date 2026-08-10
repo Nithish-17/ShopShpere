@@ -2,6 +2,7 @@ package com.shopsphere.service;
 
 import com.shopsphere.dto.product.ProductRequest;
 import com.shopsphere.dto.product.ProductResponse;
+import com.shopsphere.dto.product.ProductSearchRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface ProductService {
 
     ProductResponse getProductById(Long id);
 
-    Page<ProductResponse> searchProducts(String keyword,Pageable pageable);
+    Page<ProductResponse> searchProducts(ProductSearchRequest request, Pageable pageable);
 
     Page<ProductResponse> getProductsByCategory(Long categoryId, Pageable pageable);
 

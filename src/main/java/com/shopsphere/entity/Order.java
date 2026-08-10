@@ -62,4 +62,12 @@ public class Order extends BaseEntity{
         orderItem.setOrder(null);
     }
 
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<Payment> payments = new ArrayList<>();
+
 }

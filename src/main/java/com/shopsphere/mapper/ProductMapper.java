@@ -22,5 +22,6 @@ public interface ProductMapper {
     @Mapping(target = "category", ignore = true)
     void updateProductFromRequest(ProductRequest request,
                                   @MappingTarget Product product);
+    // MappingTarget tells don't create new object use this
 
 }

@@ -33,7 +33,7 @@ public class ShoppingCartController {
         );
     }
 
-    @PatchMapping("/users/{userId}/items/{productId}")
+    @PatchMapping("/users/items/{productId}")
     public ShoppingCartResponse updateItemQuantity(
             @PathVariable Long productId,
             @Valid @RequestBody UpdateCartItemQuantityRequest request) {
@@ -45,7 +45,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping(
-            "/users/{userId}/items/{productId}"
+            "/users/items/{productId}"
     )
     public ShoppingCartResponse removeItem(
             @PathVariable Long productId) {
@@ -55,12 +55,11 @@ public class ShoppingCartController {
         );
     }
 
-    @DeleteMapping("/users/{userId}/clear")
+    @DeleteMapping("/users/clear")
     public ShoppingCartResponse clearCart() {
 
         return shoppingCartService.clearCart();
 
     }
 
-    
 }

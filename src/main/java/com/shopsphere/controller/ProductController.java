@@ -2,7 +2,13 @@ package com.shopsphere.controller;
 
 import com.shopsphere.dto.product.ProductRequest;
 import com.shopsphere.dto.product.ProductResponse;
+import com.shopsphere.dto.product.ProductSearchRequest;
 import com.shopsphere.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +23,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
+
+@Tag(
+        name = "Product APIs",
+        description = "Operations for managing products"
+)
 public class ProductController {
 
     private final ProductService productService;
@@ -24,6 +35,28 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "create product",
+            description = "creates a new product"
+    )
+    @ApiResponses({
+
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Product Created Successfully"
+            ),
+
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid Request"
+            ),
+
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Category Not Found"
+            )
+
+    })
     public ProductResponse createProduct(
             @Valid
             @RequestBody ProductRequest request) {
@@ -48,6 +81,10 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductResponse getProductById(
+            @Parameter(
+                    description = "Unique Product ID",
+                    example = "101"
+            )
             @PathVariable Long id) {
 
         return productService.getProductById(id);
@@ -55,8 +92,8 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public Page<ProductResponse> searchProducts(
-            @RequestParam String keyword,
+    public Page<ProductResponse> getProducts(
+            @ModelAttribute ProductSearchRequest searchRequest,
             @PageableDefault(
                     page = 0,
                     size = 10,
@@ -64,7 +101,7 @@ public class ProductController {
             )
             Pageable pageable) {
 
-        return productService.searchProducts(keyword,pageable);
+        return productService.searchProducts(searchRequest,pageable);
 
     }
 

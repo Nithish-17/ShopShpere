@@ -41,6 +41,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if (shoppingCartRepository.existsByUserId(userId)) throw new BusinessException("User already has a shopping cart.");
         ShoppingCart cart = new ShoppingCart();
         cart.setUser(user);
+        user.setShoppingCart(cart);
         return shoppingCartMapper.toResponse(shoppingCartRepository.save(cart));
     }
 
@@ -71,6 +72,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         long userId =  currentUserService.getCurrentUser().getId();
         ShoppingCart cart = findCart(userId);
         CartItem item = findCartItem(cart.getId(), productId);
+        if (quantity <= 0) {
+            throw new BusinessException("Quantity must be greater than zero.");
+        }
         int difference = quantity - item.getQuantity();
         if (difference > 0) inventoryService.reserveStock(productId, difference);
         else if (difference < 0) inventoryService.releaseReservedStock(productId, Math.abs(difference));
@@ -122,6 +126,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartRepository.findByUserId(user.getId()).orElseGet(() -> {
             ShoppingCart cart = new ShoppingCart();
             cart.setUser(user);
+            user.setShoppingCart(cart);
+
             return shoppingCartRepository.save(cart);
         });
     }

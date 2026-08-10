@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            width: 700px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.15);
+        }
+
+        .header {
+            background: #1976d2;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section-title {
+            margin-top: 25px;
+            color: #1976d2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th {
+            background: #1976d2;
+            color: white;
+            padding: 10px;
+        }
+
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .summary {
+            margin-top: 25px;
+        }
+
+        .summary table td {
+            border: none;
+            padding: 6px;
+        }
+
+        .summary .label {
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #eeeeee;
+            padding: 20px;
+            text-align: center;
+            color: #555;
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>ShopSphere</h1>
+
+        <p>Your Order Has Been Confirmed</p>
+
+    </div>
+
+    <div class="content">
+
+        <h2>
+            Hello
+            <span th:text="${customerName}">
+                Customer
+            </span>,
+        </h2>
+
+        <p>
+
+            Thank you for shopping with us.
+
+            Your order has been successfully placed and confirmed.
+
+        </p>
+
+        <h3 class="section-title">
+
+            Order Information
+
+        </h3>
+
+        <table>
+
+            <tr>
+
+                <td><b>Order Number</b></td>
+
+                <td th:text="${orderNumber}"></td>
+
+            </tr>
+
+            <tr>
+
+                <td><b>Order Date</b></td>
+
+                <td th:text="${orderDate}"></td>
+
+            </tr>
+
+            <tr>
+
+                <td><b>Payment Method</b></td>
+
+                <td th:text="${paymentMethod}"></td>
+
+            </tr>
+
+        </table>
+
+        <h3 class="section-title">
+
+            Ordered Products
+
+        </h3>
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Product</th>
+
+                <th>Quantity</th>
+
+                <th>Price</th>
+
+                <th>Subtotal</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            <tr th:each="item : ${items}">
+
+                <td th:text="${item.productName}"></td>
+
+                <td th:text="${item.quantity}"></td>
+
+                <td th:text="${item.productPrice}"></td>
+
+                <td th:text="${item.subtotal}"></td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <div class="summary">
+
+            <table>
+
+                <tr>
+
+                    <td class="label">
+                        Total Amount
+                    </td>
+
+                    <td th:text="${totalAmount}"></td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+        <br>
+
+        <p>
+
+            Your invoice has been attached to this email.
+
+        </p>
+
+        <p>
+
+            Thank you for choosing
+            <strong>ShopSphere</strong>.
+
+        </p>
+
+    </div>
+
+    <div class="footer">
+
+        © 2026 ShopSphere
+
+        <br>
+
+        Happy Shopping!
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

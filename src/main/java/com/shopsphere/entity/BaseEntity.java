@@ -45,5 +45,4 @@ public abstract class BaseEntity {
     @Column(nullable = false)
     private String updatedBy;
 
-
 }

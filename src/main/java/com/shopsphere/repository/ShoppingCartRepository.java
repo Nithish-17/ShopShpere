@@ -17,5 +17,6 @@ public interface ShoppingCartRepository
     boolean existsByUserId(
             Long userId
     );
+    
 
 }

@@ -43,62 +43,62 @@ public class OrderServiceImpl implements OrderService {
 
     private final CurrentUserService  currentUserService;
 
-    @Override
-    public OrderResponse createOrder() {
+        @Override
+        public OrderResponse createOrder() {
 
-        User user = currentUserService.getCurrentUser();
+            User user = currentUserService.getCurrentUser();
 
-        long userId = user.getId();
+            long userId = user.getId();
 
-            ShoppingCart cart = shoppingCartRepository
-                    .findByUserId(user.getId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Shopping cart not found."));
+                ShoppingCart cart = shoppingCartRepository
+                        .findByUserId(user.getId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Shopping cart not found."));
 
-            if (cart.getCartItems().isEmpty()) {
-                throw new BusinessException("Shopping cart is empty.");
-            }
+                if (cart.getCartItems().isEmpty()) {
+                    throw new BusinessException("Shopping cart is empty.");
+                }
 
-            Order order = new Order();
-            order.setUser(user);
-            order.setStatus(OrderStatus.PENDING);
-            order.setOrderDate(LocalDateTime.now());
+                Order order = new Order();
+                order.setUser(user);
+                order.setStatus(OrderStatus.PENDING);
+                order.setOrderDate(LocalDateTime.now());
 
-            BigDecimal totalAmount = BigDecimal.ZERO;
+                BigDecimal totalAmount = BigDecimal.ZERO;
 
-            for (CartItem cartItem : cart.getCartItems()) {
+                for (CartItem cartItem : cart.getCartItems()) {
 
-                OrderItem orderItem = new OrderItem();
+                    OrderItem orderItem = new OrderItem();
 
-                orderItem.setProduct(cartItem.getProduct());
-                orderItem.setProductName(cartItem.getProduct().getName());
-                orderItem.setProductPrice(cartItem.getPrice());
-                orderItem.setQuantity(cartItem.getQuantity());
+                    orderItem.setProduct(cartItem.getProduct());
+                    orderItem.setProductName(cartItem.getProduct().getName());
+                    orderItem.setProductPrice(cartItem.getPrice());
+                    orderItem.setQuantity(cartItem.getQuantity());
 
-                BigDecimal subtotal =
-                        cartItem.getPrice().multiply(
-                                BigDecimal.valueOf(cartItem.getQuantity()));
+                    BigDecimal subtotal =
+                            cartItem.getPrice().multiply(
+                                    BigDecimal.valueOf(cartItem.getQuantity()));
 
-                orderItem.setSubtotal(subtotal);
+                    orderItem.setSubtotal(subtotal);
 
-                totalAmount = totalAmount.add(subtotal);
+                    totalAmount = totalAmount.add(subtotal);
 
-                inventoryService.confirmReservation(
-                        cartItem.getProduct().getId(),
-                        cartItem.getQuantity()
-                );
+                    inventoryService.confirmReservation(
+                            cartItem.getProduct().getId(),
+                            cartItem.getQuantity()
+                    );
 
-                order.addOrderItem(orderItem);
-            }
+                    order.addOrderItem(orderItem);
+                }
 
-            order.setTotalAmount(totalAmount);
+                order.setTotalAmount(totalAmount);
 
-            Order savedOrder = orderRepository.save(order);
+                Order savedOrder = orderRepository.save(order);
 
-            shoppingCartService.emptyCart();
+                shoppingCartService.emptyCart();
 
-            return orderMapper.toResponse(savedOrder);
-    }
+                return orderMapper.toResponse(savedOrder);
+        }
 
     @Override
     @Transactional(readOnly = true)

@@ -1,4 +1,4 @@
-package com.shopsphere.initializer;
+package com.shopsphere.util.initializer;
 
 import com.shopsphere.entity.Role;
 import com.shopsphere.entity.User;

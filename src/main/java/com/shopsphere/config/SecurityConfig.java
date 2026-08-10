@@ -3,11 +3,12 @@ package com.shopsphere.config;
 import com.shopsphere.entity.User;
 import com.shopsphere.exception.security.JwtAccessDeniedHandler;
 import com.shopsphere.exception.security.JwtAuthenticationEntryPoint;
+import com.shopsphere.logging.CorrelationIdFilter;
+import com.shopsphere.logging.RequestLoggingFilter;
 import com.shopsphere.security.CustomUserDetailsService;
 import com.shopsphere.security.jwt.JwtAuthenticationFilter;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -40,6 +41,10 @@ public class SecurityConfig {
 
     private final JwtAccessDeniedHandler  jwtAccessDeniedHandler;
 
+    private final RequestLoggingFilter  requestLoggingFilter;
+
+    private final CorrelationIdFilter correlationIdFilter;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
@@ -66,9 +71,16 @@ public class SecurityConfig {
                                 "/api/categories/**"
                         )
                         .permitAll()
+                        .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
+                                ).permitAll()
                         .anyRequest()
                         .authenticated()
-                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+                .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(requestLoggingFilter, JwtAuthenticationFilter.class);
         return http.build();
 
 

@@ -2,6 +2,7 @@ package com.shopsphere.service.impl;
 
 import com.shopsphere.dto.product.ProductRequest;
 import com.shopsphere.dto.product.ProductResponse;
+import com.shopsphere.dto.product.ProductSearchRequest;
 import com.shopsphere.entity.Category;
 import com.shopsphere.entity.Product;
 import com.shopsphere.exception.ResourceAlreadyExistsException;
@@ -10,9 +11,13 @@ import com.shopsphere.mapper.ProductMapper;
 import com.shopsphere.repository.CategoryRepository;
 import com.shopsphere.repository.ProductRepository;
 import com.shopsphere.service.ProductService;
+import com.shopsphere.specification.ProductSpecification;
+import com.shopsphere.specification.ProductSpecificationBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,31 +26,50 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+    private final ProductSpecificationBuilder productSpecificationBuilder;
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
+        log.info(
+                "creating product with name: {}",
+                request.getName()
+        );
+
         if (productRepository.existsByNameIgnoreCase(request.getName())) {
+            log.error(
+                    "Product already exists with name : {}",
+                    request.getName()
+            );
             throw new ResourceAlreadyExistsException(
                     "Product already exists with name: " + request.getName()
             );
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() ->{
+                        log.error("Category not found : {}", request.getCategoryId());
+                        return new ResourceNotFoundException(
                         "Category not found with id: " + request.getCategoryId()
-                ));
+                );
+                });
 
         Product product = productMapper.toEntity(request);
 
         product.setCategory(category);
 
         Product savedProduct = productRepository.save(product);
+
+        log.info(
+                "product created successfully with id : {}",
+                savedProduct.getId()
+        );
 
         return productMapper.toResponse(savedProduct);
     }
@@ -73,16 +97,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable) {
+    public Page<ProductResponse> searchProducts(
+            ProductSearchRequest request,
+            Pageable pageable) {
 
-        if (keyword == null || keyword.isBlank()) {
-            throw new IllegalArgumentException("Search keyword must not be empty");
-        }
-
-        keyword = keyword.trim();
+        Specification<Product> specification =
+                productSpecificationBuilder.build(request);
 
         return productRepository
-                .findByActiveTrueAndNameContainingIgnoreCase(keyword, pageable)
+                .findAll(specification, pageable)
                 .map(productMapper::toResponse);
     }
 
@@ -109,16 +132,29 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProduct(Long id,
                                          ProductRequest request) {
 
+        log.info(
+                "Updating product with ID: {}",
+                id
+        );
+
         Product product = findProductById(id);
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Category not found with id: " + request.getCategoryId()
-                ));
+                .orElseThrow(() -> {
+                    log.error("Category not found with id: {}", request.getCategoryId());
+                    return new ResourceNotFoundException(
+                            "Category not found with id: " + request.getCategoryId()
+                    );
+                });
 
         productMapper.updateProductFromRequest(request, product);
 
         product.setCategory(category);
+
+        log.info(
+                "Product {} updated successfully.",
+                id
+        );
 
         return productMapper.toResponse(product);
 
@@ -128,9 +164,19 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(Long id) {
 
+        log.info(
+                "Deleting product with ID: {}",
+                id
+        );
+
         Product product = findProductById(id);
 
         product.setActive(false);
+
+        log.info(
+                "Product {} deleted successfully.",
+                id
+        );
 
     }
 
@@ -143,9 +189,11 @@ public class ProductServiceImpl implements ProductService {
     private Product findProductById(Long id) {
 
         return productRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Product not found with id: " + id
-                        ));
+                .orElseThrow(() -> {
+                    log.error("Product not found with id: {}", id);
+                    return new ResourceNotFoundException(
+                            "Product not found with id: " + id
+                    );
+                });
     }
 }
